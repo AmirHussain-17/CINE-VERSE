@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineVerse — Book Tickets</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:   #f5c518; --gold-d: #c9a010;
+  --red:    #e8003d; --deep:   #07090f;
+  --card:   rgba(255,255,255,.045); --glass: rgba(255,255,255,.07);
+  --border: rgba(255,255,255,.09);  --text:  #dde0ee; --muted: #6b6f8a;
+  --green:  #22c55e; --orange: #f97316; --purple: #a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 55% at 15% 5%,rgba(232,0,61,.22) 0%,transparent 60%),
+             radial-gradient(ellipse 55% 45% at 85% 85%,rgba(245,197,24,.13) 0%,transparent 55%),
+             radial-gradient(ellipse 45% 50% at 55% 45%,rgba(40,10,80,.35) 0%,transparent 65%);}
+.bg::after{content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.5;}
+.wrap{position:relative;z-index:2;max-width:980px;margin:0 auto;padding:0 20px 100px;}
+
+/* HEADER */
+header{text-align:center;padding:54px 0 36px;animation:fadeDown .7s ease both;}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px;}
+.logo-box{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--red),#ff6b35);
+  display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 36px rgba(232,0,61,.5);}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.2rem,8vw,5.8rem);letter-spacing:5px;line-height:1;
+  background:linear-gradient(135deg,#fff 25%,var(--gold) 75%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tagline{color:var(--muted);font-size:.8rem;letter-spacing:3.5px;text-transform:uppercase;margin-top:4px;}
+.strip{display:flex;align-items:center;margin:28px 0;opacity:.2;}
+.strip-line{flex:1;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.strip-holes{display:flex;gap:7px;padding:0 14px;}
+.strip-holes b{width:10px;height:10px;border-radius:2px;background:var(--gold);display:block;}
+
+/* STEP LABEL */
+.step-lbl{display:inline-flex;align-items:center;gap:8px;font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--red);font-weight:600;margin-bottom:12px;}
+.step-lbl::before{content:'';display:block;width:18px;height:2px;background:var(--red);}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:30px 32px;margin-bottom:22px;
+  backdrop-filter:blur(14px);animation:fadeUp .55s ease both;transition:border-color .3s;}
+.card:hover{border-color:rgba(245,197,24,.18);}
+.card h3{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:2px;margin-bottom:18px;color:#fff;}
+
+/* FORM */
+select,input{width:100%;padding:13px 16px;background:rgba(255,255,255,.055);border:1px solid var(--border);
+  border-radius:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.93rem;outline:none;
+  transition:border-color .25s,background .25s;appearance:none;-webkit-appearance:none;margin-bottom:10px;}
+select:focus,input:focus{border-color:var(--gold);background:rgba(245,197,24,.06);}
+input::placeholder{color:var(--muted);}
+select option{background:#0d1220;color:#fff;}
+.sel-wrap{position:relative;}
+.sel-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-60%);color:var(--gold);pointer-events:none;font-size:.85rem;}
+label.lbl{display:block;font-size:.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.fgroup{margin-bottom:14px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border:none;
+  border-radius:11px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;
+  transition:transform .15s,box-shadow .2s,filter .2s;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+.btn-red{background:linear-gradient(135deg,var(--red),#ff5c3a);color:#fff;box-shadow:0 4px 22px rgba(232,0,61,.38);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#0a0a0a;box-shadow:0 4px 18px rgba(245,197,24,.28);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--text);color:var(--text);}
+.btn-green{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 4px 18px rgba(34,197,94,.3);}
+.btn-orange{background:linear-gradient(135deg,#c2410c,var(--orange));color:#fff;box-shadow:0 4px 18px rgba(249,115,22,.3);}
+.btn-full{width:100%;}
+.btn-sm{padding:8px 16px;font-size:.78rem;}
+
+/* MOVIE GRID */
+.movie-grid{display:grid;gap:13px;}
+.movie-card{display:flex;align-items:center;justify-content:space-between;background:var(--glass);border:1px solid var(--border);
+  border-radius:14px;padding:18px 20px;transition:border-color .3s,background .3s,transform .2s;animation:fadeUp .4s ease both;}
+.movie-card:hover{border-color:rgba(245,197,24,.28);background:rgba(255,255,255,.085);transform:translateX(5px);}
+.movie-title{font-size:1rem;font-weight:600;color:#fff;margin-bottom:7px;}
+.badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:20px;font-size:.7rem;font-weight:500;letter-spacing:.4px;}
+.b-seats{background:rgba(245,197,24,.1);color:var(--gold);border:1px solid rgba(245,197,24,.22);}
+.b-price{background:rgba(232,0,61,.1);color:#ff7090;border:1px solid rgba(232,0,61,.22);}
+.b-time{background:rgba(99,102,241,.1);color:#a5b4fc;border:1px solid rgba(99,102,241,.2);}
+.b-genre{background:rgba(34,197,94,.1);color:#6ee7b7;border:1px solid rgba(34,197,94,.2);}
+
+/* SCREEN */
+.screen-wrap{text-align:center;margin-bottom:28px;}
+.screen{display:inline-block;width:min(420px,92%);height:10px;
+  background:linear-gradient(to bottom,rgba(245,197,24,.7),transparent);
+  border-radius:50% 50% 0 0/100% 100% 0 0;box-shadow:0 -6px 40px rgba(245,197,24,.35);margin-bottom:6px;}
+.screen-lbl{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+
+/* SEAT MAP */
+.seatmap-wrap{overflow-x:auto;padding-bottom:8px;}
+.seatmap{display:inline-flex;flex-direction:column;gap:8px;min-width:max-content;}
+.seat-row{display:flex;align-items:center;gap:7px;}
+.row-label{width:22px;text-align:center;font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:1px;flex-shrink:0;}
+.seat{width:34px;height:30px;border-radius:6px 6px 3px 3px;cursor:pointer;border:none;outline:none;
+  transition:transform .15s,box-shadow .15s,background .2s;position:relative;font-size:.62rem;font-weight:700;
+  color:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;}
+.seat::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:4px;background:rgba(0,0,0,.25);border-radius:0 0 3px 3px;}
+.seat.available{background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 2px 8px rgba(34,197,94,.35);}
+.seat.available:hover{transform:translateY(-3px) scale(1.07);box-shadow:0 6px 18px rgba(34,197,94,.55);}
+.seat.selected{background:linear-gradient(135deg,var(--gold),var(--gold-d));box-shadow:0 3px 14px rgba(245,197,24,.55);transform:translateY(-2px);}
+.seat.held{background:linear-gradient(135deg,var(--orange),#ea580c);box-shadow:0 2px 8px rgba(249,115,22,.3);cursor:not-allowed;animation:pulse-o 1.5s ease-in-out infinite;}
+.seat.sold{background:#1e2535;border:1px solid rgba(255,255,255,.08);cursor:not-allowed;color:rgba(255,255,255,.18);}
+.seat.aisle{background:transparent;cursor:default;box-shadow:none;width:14px;}
+.seat.aisle::after{display:none;}
+@keyframes pulse-o{0%,100%{box-shadow:0 2px 8px rgba(249,115,22,.3);}50%{box-shadow:0 2px 20px rgba(249,115,22,.7);}}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:18px;justify-content:center;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);}
+.leg-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
+
+/* SEAT SUMMARY */
+.seat-summary{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.18);border-radius:12px;padding:16px 20px;margin-top:20px;display:none;}
+.seat-summary.show{display:block;}
+.ss-row{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;}
+.ss-row+.ss-row{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);}
+.ss-val{font-weight:600;color:var(--gold);}
+.ss-total{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);}
+.ss-discount{font-weight:600;color:var(--green);}
+
+/* ── VIP BANNER ── */
+.vip-banner{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(245,197,24,.1));
+  border:1px solid rgba(167,139,250,.3);border-radius:11px;margin-bottom:14px;
+  animation:fadeUp .3s ease both;
+}
+.vip-badge-big{font-size:1.5rem;}
+.vip-info .vip-name{font-weight:600;color:var(--purple);font-size:.9rem;}
+.vip-info .vip-disc{font-size:.75rem;color:var(--muted);margin-top:2px;}
+.vip-clear{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:4px;}
+.vip-clear:hover{color:var(--red);}
+
+/* ── VIP INPUT ROW ── */
+.vip-input-row{display:flex;gap:8px;align-items:flex-start;}
+.vip-input-row input{margin-bottom:0;flex:1;}
+.vip-verify-btn{flex-shrink:0;padding:13px 18px;height:48px;}
+
+/* POPUP */
+.popup{display:none;position:fixed;inset:0;background:rgba(4,7,14,.88);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.popup.open{display:flex;}
+.pop-box{background:linear-gradient(150deg,#0e1826,#08101c);border:1px solid var(--border);border-radius:26px;
+  padding:36px 32px;width:100%;max-width:490px;position:relative;
+  box-shadow:0 30px 90px rgba(0,0,0,.75),0 0 70px rgba(232,0,61,.07);
+  animation:popIn .32s cubic-bezier(.34,1.56,.64,1) both;max-height:90vh;overflow-y:auto;}
+.pop-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;color:#fff;margin-bottom:4px;}
+.pop-sub{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.close-x{position:sticky;top:0;float:right;margin-bottom:-32px;background:rgba(255,255,255,.07);
+  border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s,color .2s;z-index:1;}
+.close-x:hover{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* TIMER */
+.tbar-wrap{background:rgba(255,255,255,.06);border-radius:6px;height:5px;margin-bottom:20px;overflow:hidden;}
+.tbar{height:100%;background:linear-gradient(to right,var(--gold),var(--red));border-radius:6px;transition:width 1s linear;width:100%;}
+.t-txt{font-size:.75rem;color:var(--gold);text-align:right;margin-bottom:5px;font-weight:600;letter-spacing:1px;}
+
+/* STEPS DOTS */
+.steps-ind{display:flex;gap:6px;margin-bottom:24px;}
+.s-dot{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .4s;}
+.s-dot.done{background:var(--green);}
+.s-dot.active{background:var(--gold);}
+
+/* PAYMENT */
+.pay-methods{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.pay-opt{flex:1;min-width:90px;padding:12px 10px;border-radius:11px;border:1px solid var(--border);
+  background:var(--glass);cursor:pointer;text-align:center;transition:border-color .2s,background .2s;}
+.pay-opt.selected{border-color:var(--gold);background:rgba(245,197,24,.1);}
+.pay-opt .p-icon{font-size:1.4rem;margin-bottom:4px;}
+.pay-opt .p-lbl{font-size:.72rem;font-weight:600;letter-spacing:.5px;color:var(--muted);}
+.pay-opt.selected .p-lbl{color:var(--gold);}
+.upi-wrap{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.upi-id-box{background:rgba(245,197,24,.07);border:1px dashed rgba(245,197,24,.3);border-radius:8px;
+  padding:12px 16px;margin:10px 0;font-family:monospace;font-size:1rem;letter-spacing:1px;color:var(--gold);text-align:center;
+  cursor:pointer;transition:background .2s;}
+.upi-id-box:hover{background:rgba(245,197,24,.13);}
+.qr-box{width:140px;height:140px;margin:12px auto;background:#fff;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:center;}
+.qr-box svg{width:100%;height:100%;}
+.divider{height:1px;background:var(--border);margin:18px 0;}
+
+/* PRICING BREAKDOWN */
+.price-box{background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.15);border-radius:11px;padding:14px 18px;margin-bottom:14px;}
+.pb-row{display:flex;justify-content:space-between;font-size:.85rem;padding:3px 0;}
+.pb-row.discount{color:var(--green);}
+.pb-row.total{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);padding-top:8px;border-top:1px solid rgba(255,255,255,.07);margin-top:6px;}
+
+/* CONFIRM */
+.confirm-card{text-align:center;padding:10px 0;}
+.confirm-icon{font-size:3.5rem;margin-bottom:14px;animation:pop-bounce .5s ease both .1s;}
+@keyframes pop-bounce{from{transform:scale(0)}to{transform:scale(1)}}
+.confirm-card h2{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;color:var(--green);margin-bottom:6px;}
+.confirm-detail{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:12px;padding:16px;margin-top:16px;text-align:left;}
+.cd-row{display:flex;justify-content:space-between;font-size:.85rem;padding:5px 0;}
+.cd-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,.05);}
+.cd-key{color:var(--muted);}
+.cd-val{font-weight:600;color:var(--text);}
+
+/* ── HISTORY ITEMS ── */
+.hist-item{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;transition:border-color .2s;}
+.hist-item:hover{border-color:rgba(255,255,255,.15);}
+.hi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.hi-id{font-size:.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.hi-status{font-size:.7rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+.hi-status.confirmed{color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);}
+.hi-status.cancelled{color:var(--orange);background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);}
+.hi-status.refunded{color:var(--purple);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);}
+.hi-main{font-weight:600;color:#fff;font-size:.95rem;margin-bottom:4px;}
+.hi-meta{color:var(--gold);font-size:.78rem;margin-bottom:6px;}
+.hi-theater{font-size:.72rem;color:var(--muted);margin-bottom:10px;}
+.hi-pricing{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.hi-price-tag{font-size:.72rem;padding:3px 10px;border-radius:20px;}
+.hi-price-tag.base{background:rgba(255,255,255,.06);color:var(--muted);}
+.hi-price-tag.disc{background:rgba(34,197,94,.1);color:var(--green);}
+.hi-price-tag.final{background:rgba(245,197,24,.1);color:var(--gold);font-weight:700;}
+.hi-price-tag.vip{background:rgba(167,139,250,.12);color:var(--purple);}
+
+/* REFUND SECTION in history item */
+.refund-section{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.15);border-radius:10px;padding:12px 14px;margin-top:8px;}
+.refund-title{font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+.refund-row{display:flex;justify-content:space-between;font-size:.78rem;padding:2px 0;color:var(--muted);}
+.refund-row span:last-child{color:var(--text);font-weight:500;}
+.refund-status-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;}
+.refund-status-badge.pending{background:rgba(249,115,22,.15);color:var(--orange);}
+.refund-status-badge.processed{background:rgba(167,139,250,.15);color:var(--purple);}
+
+/* CANCEL CONFIRM POPUP */
+.cancel-confirm-box{text-align:center;padding:10px 0;}
+.cancel-confirm-box .warn-icon{font-size:3rem;margin-bottom:12px;}
+.cancel-confirm-box h3{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--orange);margin-bottom:8px;}
+
+/* THEATER HEADER */
+.th-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.th-icon{font-size:2rem;}
+.th-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#fff;}
+.th-meta{font-size:.78rem;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;right:30px;z-index:999;background:#0e1826;border:1px solid var(--border);
+  border-radius:12px;padding:14px 20px;font-size:.85rem;color:var(--text);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateX(130%);transition:transform .35s ease;max-width:320px;}
+.toast.show{transform:translateX(0);}
+.toast.success{border-color:rgba(34,197,94,.4);}
+.toast.warn{border-color:rgba(249,115,22,.4);}
+.toast.vip{border-color:rgba(167,139,250,.4);}
+
+/* SPINNER */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.hidden{display:none!important;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:3px;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-row">
+    <div class="logo-box">🎬</div>
+    <h1>CineVerse</h1>
+  </div>
+  <p class="tagline">Your premium seat, your perfect show</p>
+</header>
+<div class="strip">
+  <div class="strip-line"></div>
+  <div class="strip-holes"><b></b><b></b><b></b><b></b><b></b><b></b></div>
+  <div class="strip-line"></div>
+</div>
+
+<!-- STEP 1: THEATER -->
+<div class="card" id="step1">
+  <div class="step-lbl">Step 01</div>
+  <h3>Select Theater</h3>
+  <div class="sel-wrap">
+    <select id="theaterSelect" onchange="onTheaterChange()">
+      <option value="">— Choose a theater —</option>
+    </select>
+  </div>
+  <div id="theaterInfo" class="hidden">
+    <div class="th-header" id="theaterHeader"></div>
+  </div>
+</div>
+
+<!-- STEP 2: MOVIES -->
+<div class="card hidden" id="step2">
+  <div class="step-lbl">Step 02</div>
+  <h3>Now Showing</h3>
+  <div class="movie-grid" id="movieGrid"></div>
+</div>
+
+<!-- STEP 3: SEAT MAP -->
+<div class="card hidden" id="step3">
+  <div class="step-lbl">Step 03</div>
+  <h3 id="seatMapTitle">Select Your Seats</h3>
+  <div class="screen-wrap">
+    <div class="screen"></div>
+    <div class="screen-lbl">Screen · All Eyes This Way</div>
+  </div>
+  <div class="seatmap-wrap"><div class="seatmap" id="seatmap"></div></div>
+  <div class="legend">
+    <div class="legend-item"><div class="leg-dot" style="background:#22c55e"></div>Available</div>
+    <div class="legend-item"><div class="leg-dot" style="background:var(--gold)"></div>Your Selection</div>
+    <div class="legend-item"><div class="leg-dot" style="background:var(--orange)"></div>Being Booked</div>
+    <div class="legend-item"><div class="leg-dot" style="background:#1e2535;border:1px solid rgba(255,255,255,.1)"></div>Sold Out</div>
+  </div>
+  <div class="seat-summary hidden" id="seatSummary">
+    <div class="ss-row"><span>Selected Seats</span><span class="ss-val" id="ss-seats">—</span></div>
+    <div class="ss-row"><span>Price per Seat</span><span class="ss-val" id="ss-price">—</span></div>
+    <div class="ss-row hidden" id="ss-disc-row"><span>VIP Discount (15%)</span><span class="ss-discount" id="ss-discount">—</span></div>
+    <div class="ss-row"><span style="font-weight:600">Total Amount</span><span class="ss-total" id="ss-total">₹0</span></div>
+    <div style="margin-top:16px">
+      <button class="btn btn-gold btn-full" onclick="proceedToBooking()">Continue to Booking →</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+
+<!-- ══════════════ BOOKING POPUP ══════════════ -->
+<div class="popup" id="bookingPopup">
+  <div class="pop-box">
+    <button class="close-x" onclick="cancelBooking()">✕</button>
+    <div class="steps-ind">
+      <div class="s-dot active" id="sd1"></div>
+      <div class="s-dot" id="sd2"></div>
+      <div class="s-dot" id="sd3"></div>
+    </div>
+
+    <!-- Step A: Details -->
+    <div id="popDetails">
+      <div class="pop-title">Your Details</div>
+      <div class="pop-sub" id="popMovieName"></div>
+      <div class="t-txt" id="timerTxt"></div>
+      <div class="tbar-wrap"><div class="tbar" id="timerBar"></div></div>
+
+      <div class="fgroup">
+        <label class="lbl">Full Name</label>
+        <input type="text" id="inpName" placeholder="e.g. Arjun Sharma">
+      </div>
+      <div class="frow">
+        <div class="fgroup">
+          <label class="lbl">Contact Type</label>
+          <div class="sel-wrap"><select id="inpCtype"><option value="email">Email</option><option value="phone">Phone</option></select></div>
+        </div>
+        <div class="fgroup">
+          <label class="lbl">Email / Phone</label>
+          <input type="text" id="inpContact" placeholder="you@email.com">
+        </div>
+      </div>
+
+      <!-- ── VIP ID FIELD ── -->
+      <div class="fgroup">
+        <label class="lbl">VIP Member ID <span style="color:var(--muted);font-size:.65rem;text-transform:none;letter-spacing:0">(optional — get 15% off)</span></label>
+        <div id="vipBanner" class="vip-banner hidden">
+          <span class="vip-badge-big">⭐</span>
+          <div class="vip-info">
+            <div class="vip-name" id="vipBannerName">—</div>
+            <div class="vip-disc" id="vipBannerDisc">15% discount applied</div>
+          </div>
+          <button class="vip-clear" onclick="clearVip()" title="Remove VIP">✕</button>
+        </div>
+        <div id="vipInputArea">
+          <div class="vip-input-row">
+            <input type="text" id="inpVipId" placeholder="e.g. VIP001" style="text-transform:uppercase;margin-bottom:0">
+            <button class="btn btn-gold vip-verify-btn" onclick="verifyVip()">Verify</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <label class="lbl">Selected Seats</label>
+        <input type="text" id="inpSeatsDisplay" readonly style="color:var(--gold);cursor:default">
+      </div>
+
+      <!-- Pricing breakdown -->
+      <div class="price-box" id="priceBox">
+        <div class="pb-row"><span>Base Total</span><span id="pbBase">₹0</span></div>
+        <div class="pb-row discount hidden" id="pbDiscRow"><span>⭐ VIP Discount (15%)</span><span id="pbDisc" style="color:var(--green)">−₹0</span></div>
+        <div class="pb-row total"><span>Total Payable</span><span id="pbTotal">₹0</span></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:6px">
+        <button class="btn btn-ghost" style="flex:1" onclick="cancelBooking()">Cancel</button>
+        <button class="btn btn-gold" style="flex:2" onclick="goToPayment()">Proceed to Pay →</button>
+      </div>
+    </div>
+
+    <!-- Step B: Payment -->
+    <div id="popPayment" class="hidden">
+      <div class="pop-title">Payment</div>
+      <div class="pop-sub">Complete your booking</div>
+      <div class="t-txt" id="timerTxt2"></div>
+      <div class="tbar-wrap"><div class="tbar" id="timerBar2"></div></div>
+
+      <div class="pay-methods">
+        <div class="pay-opt selected" id="pm-upi" onclick="selectPay('upi')"><div class="p-icon">📲</div><div class="p-lbl">UPI</div></div>
+        <div class="pay-opt" id="pm-card" onclick="selectPay('card')"><div class="p-icon">💳</div><div class="p-lbl">Card</div></div>
+        <div class="pay-opt" id="pm-cash" onclick="selectPay('cash')"><div class="p-icon">💵</div><div class="p-lbl">Cash</div></div>
+      </div>
+
+      <!-- UPI -->
+      <div id="secUpi">
+        <div class="upi-wrap">
+          <div style="font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Pay to UPI ID</div>
+          <div class="upi-id-box" id="upiIdBox" onclick="copyUpi()" title="Tap to copy">—</div>
+          <div class="qr-box" id="qrBox"></div>
+          <div style="font-size:.72rem;color:var(--muted);text-align:center">Tap UPI ID to copy · Scan QR to pay</div>
+        </div>
+        <div class="price-box" id="payPriceBox" style="margin-bottom:14px"></div>
+        <div class="fgroup"><label class="lbl">UTR / Transaction ID</label><input type="text" id="inpUtr" placeholder="12-digit UTR number"></div>
+      </div>
+      <!-- Card -->
+      <div id="secCard" class="hidden">
+        <div class="fgroup"><label class="lbl">Card Number</label><input type="text" id="inpCard" placeholder="XXXX XXXX XXXX XXXX" maxlength="19"></div>
+        <div class="frow">
+          <div class="fgroup"><label class="lbl">Expiry</label><input type="text" id="inpExp" placeholder="MM/YY" maxlength="5"></div>
+          <div class="fgroup"><label class="lbl">CVV</label><input type="text" id="inpCvv" placeholder="XXX" maxlength="3"></div>
+        </div>
+        <div class="fgroup"><label class="lbl">Cardholder Name</label><input type="text" id="inpCname" placeholder="Name on card"></div>
+      </div>
+      <!-- Cash -->
+      <div id="secCash" class="hidden">
+        <div class="upi-wrap" style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:10px">🏦</div>
+          <div style="font-size:.9rem;color:var(--text)">Pay <strong id="cashAmt" style="color:var(--gold)"></strong> at the counter</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Show your Booking ID at the counter</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-ghost" style="flex:1" onclick="backToDetails()">← Back</button>
+        <button class="btn btn-green" style="flex:2" id="payBtn" onclick="processPayment()">Pay Now ✓</button>
+      </div>
+    </div>
+
+    <!-- Step C: Confirmed -->
+    <div id="popConfirm" class="hidden">
+      <div class="confirm-card">
+        <div class="confirm-icon">🎟️</div>
+        <h2>Booking Confirmed!</h2>
+        <p style="color:var(--muted);font-size:.85rem">Your seats are reserved. Enjoy the show!</p>
+        <div class="confirm-detail" id="confirmDetail"></div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button class="btn btn-ghost" style="flex:1" onclick="openHistory()">View History</button>
+          <button class="btn btn-red" style="flex:1" onclick="closeAndReset()">Book Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════ HISTORY POPUP ══════════════ -->
+<div class="popup" id="historyPopup">
+  <div class="pop-box" style="max-width:540px">
+    <button class="close-x" onclick="closeHistory()">✕</button>
+    <div class="pop-title">My Bookings</div>
+    <div class="pop-sub">Manage and cancel your tickets</div>
+    <div id="historyList" style="margin-top:10px;max-height:480px;overflow-y:auto"></div>
+    <button class="btn btn-red btn-full" style="margin-top:12px" onclick="closeHistory()">Close</button>
+  </div>
+</div>
+
+
+<!-- ══════════════ CANCEL CONFIRM POPUP ══════════════ -->
+<div class="popup" id="cancelPopup">
+  <div class="pop-box" style="max-width:420px">
+    <div class="cancel-confirm-box">
+      <div class="warn-icon">⚠️</div>
+      <h3>Cancel Booking?</h3>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Your seats will be released and a full refund of <strong id="cancelRefundAmt" style="color:var(--green)">₹0</strong> will be processed.</p>
+      <div class="fgroup" style="text-align:left">
+        <label class="lbl">Reason for cancellation (optional)</label>
+        <input type="text" id="cancelReason" placeholder="e.g. Change of plans">
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeCancelPopup()">Keep Booking</button>
+        <button class="btn btn-orange" style="flex:1" id="confirmCancelBtn" onclick="confirmCancel()">Yes, Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+const SESSION_ID = 'sess_' + Math.random().toString(36).slice(2, 9);
+let theaters       = [];
+let currentTheater = null;
+let currentMovie   = null;
+let selectedSeats  = [];
+let timerInterval  = null;
+let timerSeconds   = 300;
+let payMethod      = 'upi';
+let pollInterval   = null;
+let pendingCancelBookingId = null;
+
+// VIP state
+let vipVerified    = false;
+let vipMember      = null; // { vipId, name, discount }
+
+// ════════════════════════════════════════
+//  API HELPER
+// ════════════════════════════════════════
+async function api(path, opts = {}) {
+  const res = await fetch('/api' + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts
+  });
+  return res.json();
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+async function init() {
+  theaters = await api('/theaters');
+  const sel = document.getElementById('theaterSelect');
+  theaters.forEach(t => { sel.innerHTML += `<option value="${t.id}">${t.icon} ${t.name}</option>`; });
+}
+init();
+
+// ════════════════════════════════════════
+//  THEATER CHANGE
+// ════════════════════════════════════════
+function onTheaterChange() {
+  const tid = Number(document.getElementById('theaterSelect').value);
+  currentTheater = theaters.find(t => t.id === tid) || null;
+  currentMovie = null; selectedSeats = []; stopPoll();
+
+  if (!currentTheater) {
+    document.getElementById('theaterInfo').classList.add('hidden');
+    document.getElementById('step2').classList.add('hidden');
+    document.getElementById('step3').classList.add('hidden');
+    return;
+  }
+  document.getElementById('theaterInfo').classList.remove('hidden');
+  document.getElementById('theaterHeader').innerHTML = `
+    <div class="th-icon">${currentTheater.icon}</div>
+    <div>
+      <div class="th-name">${currentTheater.name}</div>
+      <div class="th-meta">📍 ${currentTheater.location} · ${currentTheater.screens} screens</div>
+    </div>`;
+  renderMovies();
+  document.getElementById('step2').classList.remove('hidden');
+  document.getElementById('step3').classList.add('hidden');
+  document.getElementById('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ════════════════════════════════════════
+//  MOVIES
+// ════════════════════════════════════════
+function renderMovies() {
+  const grid = document.getElementById('movieGrid');
+  grid.innerHTML = '';
+  currentTheater.movies.forEach((m, i) => {
+    grid.innerHTML += `
+      <div class="movie-card" style="animation-delay:${i * 0.07}s">
+        <div class="movie-info">
+          <div class="movie-title">🎥 ${m.title}</div>
+          <div class="badges">
+            <span class="badge b-time">🕐 ${m.time}</span>
+            <span class="badge b-seats">🪑 ${m.availableSeats}/${m.totalSeats} seats</span>
+            <span class="badge b-price">₹${m.price}</span>
+            <span class="badge b-genre">${m.genre}</span>
+          </div>
+        </div>
+        <button class="btn btn-red" onclick="selectMovie(${m.id})" ${m.availableSeats === 0 ? 'disabled' : ''}>
+          ${m.availableSeats === 0 ? 'Houseful' : 'Select'}
+        </button>
+      </div>`;
+  });
+}
+
+// ════════════════════════════════════════
+//  SELECT MOVIE → SEAT MAP
+// ════════════════════════════════════════
+async function selectMovie(movieId) {
+  if (currentMovie) await api('/seats/release', { method: 'POST', body: JSON.stringify({ movieId: currentMovie.id, sessionId: SESSION_ID }) });
+  currentMovie = currentTheater.movies.find(m => m.id === movieId);
+  selectedSeats = [];
+  document.getElementById('seatMapTitle').textContent = `🎥 ${currentMovie.title} — ${currentMovie.time}`;
+  await loadSeatMap();
+  document.getElementById('step3').classList.remove('hidden');
+  document.getElementById('seatSummary').classList.remove('show');
+  document.getElementById('seatSummary').classList.add('hidden');
+  document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  startPoll();
+}
+
+// ════════════════════════════════════════
+//  SEAT MAP
+// ════════════════════════════════════════
+async function loadSeatMap() {
+  const data = await api(`/seats/${currentMovie.id}?sessionId=${SESSION_ID}`);
+  renderSeatMap(data);
+}
+
+function renderSeatMap(data) {
+  const map = document.getElementById('seatmap');
+  map.innerHTML = '';
+  data.rows.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'seat-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'row-label'; lbl.textContent = row;
+    rowEl.appendChild(lbl);
+    const aisleAfter = data.seatsPerRow > 8 ? Math.floor(data.seatsPerRow / 2) : null;
+    for (let col = 1; col <= data.seatsPerRow; col++) {
+      if (aisleAfter && col === aisleAfter + 1) {
+        const a = document.createElement('div'); a.className = 'seat aisle'; rowEl.appendChild(a);
+      }
+      const seatId = row + col;
+      const status = data.seatMap[seatId] || 'available';
+      const btn = document.createElement('button');
+      btn.className = `seat ${status}`;
+      btn.title = `Row ${row} · Seat ${col} · ${status}`;
+      btn.textContent = col;
+      if (status === 'available' || status === 'selected') btn.onclick = () => toggleSeat(seatId);
+      rowEl.appendChild(btn);
+    }
+    map.appendChild(rowEl);
+  });
+  updateSeatSummary();
+}
+
+// ════════════════════════════════════════
+//  TOGGLE SEAT
+// ════════════════════════════════════════
+async function toggleSeat(seatId) {
+  const idx = selectedSeats.indexOf(seatId);
+  if (idx === -1) {
+    const newSeats = [...selectedSeats, seatId];
+    const res = await api('/seats/hold', { method: 'POST', body: JSON.stringify({ movieId: currentMovie.id, seatIds: newSeats, sessionId: SESSION_ID }) });
+    if (!res.success) { showToast('⚠️ ' + res.message, 'warn'); await loadSeatMap(); return; }
+    selectedSeats = newSeats;
+    showToast(`Seat ${seatId} selected`, 'success');
+  } else {
+    selectedSeats.splice(idx, 1);
+    if (selectedSeats.length > 0) {
+      await api('/seats/hold', { method: 'POST', body: JSON.stringify({ movieId: currentMovie.id, seatIds: selectedSeats, sessionId: SESSION_ID }) });
+    } else {
+      await api('/seats/release', { method: 'POST', body: JSON.stringify({ movieId: currentMovie.id, sessionId: SESSION_ID }) });
+    }
+  }
+  await loadSeatMap();
+}
+
+// ════════════════════════════════════════
+//  SEAT SUMMARY (with VIP discount)
+// ════════════════════════════════════════
+function updateSeatSummary() {
+  const sum = document.getElementById('seatSummary');
+  if (selectedSeats.length === 0) { sum.classList.remove('show'); sum.classList.add('hidden'); return; }
+  sum.classList.add('show'); sum.classList.remove('hidden');
+
+  const base        = selectedSeats.length * currentMovie.price;
+  const discAmt     = vipVerified ? Math.round(base * 0.15) : 0;
+  const finalTotal  = base - discAmt;
+
+  document.getElementById('ss-seats').textContent  = selectedSeats.join(', ');
+  document.getElementById('ss-price').textContent  = `₹${currentMovie.price} × ${selectedSeats.length}`;
+  document.getElementById('ss-total').textContent  = `₹${finalTotal}`;
+
+  const discRow = document.getElementById('ss-disc-row');
+  if (vipVerified) {
+    discRow.classList.remove('hidden');
+    document.getElementById('ss-discount').textContent = `−₹${discAmt}`;
+  } else {
+    discRow.classList.add('hidden');
+  }
+}
+
+// ════════════════════════════════════════
+//  POLLING
+// ════════════════════════════════════════
+function startPoll() {
+  stopPoll();
+  pollInterval = setInterval(async () => { if (currentMovie) await loadSeatMap(); }, 4000);
+}
+function stopPoll() { clearInterval(pollInterval); pollInterval = null; }
+
+// ════════════════════════════════════════
+//  VIP VERIFICATION
+// ════════════════════════════════════════
+async function verifyVip() {
+  const vipId = document.getElementById('inpVipId').value.trim();
+  if (!vipId) { showToast('Please enter a VIP ID', 'warn'); return; }
+
+  const res = await api('/vip/verify', { method: 'POST', body: JSON.stringify({ vipId }) });
+  if (!res.valid) {
+    showToast('❌ ' + res.message, 'warn');
+    document.getElementById('inpVipId').style.borderColor = 'var(--red)';
+    return;
+  }
+
+  vipVerified = true;
+  vipMember   = res.member;
+
+  document.getElementById('inpVipId').style.borderColor = '';
+  document.getElementById('vipBanner').classList.remove('hidden');
+  document.getElementById('vipInputArea').classList.add('hidden');
+  document.getElementById('vipBannerName').textContent = `⭐ ${res.member.name} (${res.member.vipId})`;
+  document.getElementById('vipBannerDisc').textContent = `${res.member.discount}% VIP discount applied`;
+
+  updatePriceBox();
+  updateSeatSummary();
+  showToast(`✅ VIP verified! ${res.member.discount}% discount applied`, 'vip');
+}
+
+function clearVip() {
+  vipVerified = false; vipMember = null;
+  document.getElementById('inpVipId').value = '';
+  document.getElementById('vipBanner').classList.add('hidden');
+  document.getElementById('vipInputArea').classList.remove('hidden');
+  updatePriceBox();
+  updateSeatSummary();
+  showToast('VIP removed', 'warn');
+}
+
+// ════════════════════════════════════════
+//  PRICE BOX (in popup)
+// ════════════════════════════════════════
+function updatePriceBox() {
+  if (!currentMovie || !selectedSeats.length) return;
+  const base       = selectedSeats.length * currentMovie.price;
+  const discAmt    = vipVerified ? Math.round(base * 0.15) : 0;
+  const finalTotal = base - discAmt;
+
+  document.getElementById('pbBase').textContent  = `₹${base}`;
+  document.getElementById('pbTotal').textContent = `₹${finalTotal}`;
+  document.getElementById('cashAmt').textContent = `₹${finalTotal}`;
+
+  const discRow = document.getElementById('pbDiscRow');
+  if (vipVerified) {
+    discRow.classList.remove('hidden');
+    document.getElementById('pbDisc').textContent = `−₹${discAmt}`;
+  } else {
+    discRow.classList.add('hidden');
+  }
+
+  // Also update the pay page summary
+  const payPriceBox = document.getElementById('payPriceBox');
+  payPriceBox.innerHTML = `
+    <div class="pb-row"><span>Base Total</span><span>₹${base}</span></div>
+    ${vipVerified ? `<div class="pb-row discount"><span>⭐ VIP Discount (15%)</span><span style="color:var(--green)">−₹${discAmt}</span></div>` : ''}
+    <div class="pb-row total"><span>Total Payable</span><span>₹${finalTotal}</span></div>
+  `;
+}
+
+function getCalcTotals() {
+  const base       = selectedSeats.length * currentMovie.price;
+  const discAmt    = vipVerified ? Math.round(base * 0.15) : 0;
+  const finalTotal = base - discAmt;
+  return { base, discAmt, finalTotal };
+}
+
+// ════════════════════════════════════════
+//  PROCEED TO BOOKING
+// ════════════════════════════════════════
+async function proceedToBooking() {
+  if (selectedSeats.length === 0) { showToast('Select at least one seat', 'warn'); return; }
+
+  const upi = await api('/upi');
+  document.getElementById('upiIdBox').textContent = upi.upiId;
+  generateQR(upi.upiId);
+
+  document.getElementById('popMovieName').textContent = `${currentMovie.title} · ${currentTheater.name} · ${currentMovie.time}`;
+  document.getElementById('inpSeatsDisplay').value    = selectedSeats.join(', ');
+  updatePriceBox();
+
+  showPopStep('Details'); stepDots(0);
+  startTimer();
+  document.getElementById('bookingPopup').classList.add('open');
+}
+
+// ════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════
+function startTimer() {
+  clearInterval(timerInterval);
+  timerSeconds = 300; tick();
+  timerInterval = setInterval(() => {
+    timerSeconds--; tick();
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      cancelBooking();
+      showToast('⏰ Session expired. Seats released.', 'warn');
+    }
+  }, 1000);
+}
+function tick() {
+  const m = Math.floor(timerSeconds / 60), s = timerSeconds % 60;
+  const txt = `⏱ ${m}:${s < 10 ? '0' : ''}${s} remaining`;
+  const pct = (timerSeconds / 300 * 100) + '%';
+  ['timerTxt','timerTxt2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = txt; });
+  ['timerBar','timerBar2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; });
+}
+
+// ════════════════════════════════════════
+//  POP STEPS
+// ════════════════════════════════════════
+function showPopStep(s) {
+  ['Details','Payment','Confirm'].forEach(x => document.getElementById('pop'+x).classList.add('hidden'));
+  document.getElementById('pop'+s).classList.remove('hidden');
+}
+function stepDots(active) {
+  ['sd1','sd2','sd3'].forEach((id,i) => {
+    const el = document.getElementById(id); el.classList.remove('active','done');
+    if (i < active) el.classList.add('done'); else if (i === active) el.classList.add('active');
+  });
+}
+function goToPayment() {
+  if (!document.getElementById('inpName').value.trim())    { showToast('Please enter your name', 'warn'); return; }
+  if (!document.getElementById('inpContact').value.trim()) { showToast('Please enter contact info', 'warn'); return; }
+  showPopStep('Payment'); stepDots(1);
+}
+function backToDetails() { showPopStep('Details'); stepDots(0); }
+
+// ════════════════════════════════════════
+//  PAYMENT METHOD
+// ════════════════════════════════════════
+function selectPay(m) {
+  payMethod = m;
+  ['upi','card','cash'].forEach(x => document.getElementById(`pm-${x}`).classList.toggle('selected', x === m));
+  document.getElementById('secUpi').classList.toggle('hidden', m !== 'upi');
+  document.getElementById('secCard').classList.toggle('hidden', m !== 'card');
+  document.getElementById('secCash').classList.toggle('hidden', m !== 'cash');
+}
+function copyUpi() {
+  navigator.clipboard.writeText(document.getElementById('upiIdBox').textContent)
+    .then(() => showToast('UPI ID copied!', 'success'));
+}
+
+// ════════════════════════════════════════
+//  QR
+// ════════════════════════════════════════
+function generateQR(upiId) {
+  const size = 21, seed = upiId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  let cells = '';
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const inTL = r < 7 && c < 7, inTR = r < 7 && c >= size-7, inBL = r >= size-7 && c < 7;
+      let fill = '#fff';
+      if (inTL || inTR || inBL) {
+        const lr = inTL ? r : inTR ? r : r-(size-7), lc = inTL ? c : inTR ? c-(size-7) : c;
+        fill = (lr===0||lr===6||lc===0||lc===6) ? '#000' : (lr>=2&&lr<=4&&lc>=2&&lc<=4) ? '#000' : '#fff';
+      } else { fill = Math.sin(seed * 0.1 + r * 17 + c * 13) > 0 ? '#000' : '#fff'; }
+      cells += `<rect x="${c*5}" y="${r*5}" width="5" height="5" fill="${fill}"/>`;
+    }
+  }
+  document.getElementById('qrBox').innerHTML = `<svg viewBox="0 0 ${size*5} ${size*5}" xmlns="http://www.w3.org/2000/svg">${cells}</svg>`;
+}
+
+// ════════════════════════════════════════
+//  PROCESS PAYMENT
+// ════════════════════════════════════════
+async function processPayment() {
+  if (payMethod === 'upi' && !document.getElementById('inpUtr').value.trim()) { showToast('Enter UTR / transaction ID', 'warn'); return; }
+  if (payMethod === 'card' && document.getElementById('inpCard').value.replace(/\s/g,'').length < 16) { showToast('Enter valid card number', 'warn'); return; }
+
+  const btn = document.getElementById('payBtn');
+  btn.innerHTML = '<span class="spinner"></span> Processing...'; btn.disabled = true;
+  await new Promise(r => setTimeout(r, 1800));
+  await doConfirmBooking();
+  btn.innerHTML = 'Pay Now ✓'; btn.disabled = false;
+}
+
+// ════════════════════════════════════════
+//  CONFIRM BOOKING
+// ════════════════════════════════════════
+async function doConfirmBooking() {
+  clearInterval(timerInterval);
+  const { base, discAmt, finalTotal } = getCalcTotals();
+
+  const res = await api('/booking/confirm', {
+    method: 'POST',
+    body: JSON.stringify({
+      movieId:      currentMovie.id,
+      sessionId:    SESSION_ID,
+      seatIds:      selectedSeats,
+      name:         document.getElementById('inpName').value.trim(),
+      contact:      document.getElementById('inpContact').value.trim(),
+      contactType:  document.getElementById('inpCtype').value,
+      isVip:        vipVerified,
+      vipId:        vipMember ? vipMember.vipId : null,
+      vipMemberName:vipMember ? vipMember.name  : null,
+      discount:     vipMember ? vipMember.discount : 0,
+      payMethod,
+      utrId:        document.getElementById('inpUtr').value.trim()
+    })
+  });
+
+  if (!res.success) {
+    showToast('❌ ' + res.message, 'warn');
+    await loadSeatMap(); showPopStep('Details'); stepDots(0);
+    selectedSeats = []; updateSeatSummary(); return;
+  }
+
+  const b = res.booking;
+  document.getElementById('confirmDetail').innerHTML = `
+    <div class="cd-row"><span class="cd-key">Booking ID</span><span class="cd-val" style="color:var(--gold)">${b.id}</span></div>
+    <div class="cd-row"><span class="cd-key">Name</span><span class="cd-val">${b.name}</span></div>
+    <div class="cd-row"><span class="cd-key">Movie</span><span class="cd-val">${b.movie}</span></div>
+    <div class="cd-row"><span class="cd-key">Theater</span><span class="cd-val">${b.theater}</span></div>
+    <div class="cd-row"><span class="cd-key">Show Time</span><span class="cd-val">${b.time}</span></div>
+    <div class="cd-row"><span class="cd-key">Seats</span><span class="cd-val">${b.seats.join(', ')}</span></div>
+    ${b.isVip ? `<div class="cd-row"><span class="cd-key">VIP Member</span><span class="cd-val" style="color:var(--purple)">⭐ ${b.vipMemberName} (${b.vipId})</span></div>
+    <div class="cd-row"><span class="cd-key">VIP Discount (15%)</span><span class="cd-val" style="color:var(--green)">−₹${b.discountAmount}</span></div>` : ''}
+    <div class="cd-row"><span class="cd-key">Amount Paid</span><span class="cd-val" style="color:var(--green)">₹${b.finalTotal}</span></div>
+    <div class="cd-row"><span class="cd-key">Payment</span><span class="cd-val">${b.payMethod.toUpperCase()}</span></div>
+  `;
+
+  showPopStep('Confirm'); stepDots(2);
+  selectedSeats = []; updateSeatSummary();
+
+  theaters = await api('/theaters');
+  currentTheater = theaters.find(t => t.id === currentTheater.id);
+  renderMovies();
+  await loadSeatMap();
+}
+
+// ════════════════════════════════════════
+//  CANCEL BOOKING (hold release)
+// ════════════════════════════════════════
+async function cancelBooking() {
+  clearInterval(timerInterval);
+  if (currentMovie) await api('/seats/release', { method: 'POST', body: JSON.stringify({ movieId: currentMovie.id, sessionId: SESSION_ID }) });
+  selectedSeats = [];
+  document.getElementById('bookingPopup').classList.remove('open');
+  showPopStep('Details'); stepDots(0); clearForm();
+  if (currentMovie) await loadSeatMap();
+  updateSeatSummary();
+}
+
+function closeAndReset() {
+  document.getElementById('bookingPopup').classList.remove('open');
+  document.getElementById('step3').classList.add('hidden');
+  currentMovie = null; selectedSeats = []; stopPoll(); clearForm();
+  showPopStep('Details'); stepDots(0);
+  document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
+}
+
+function clearForm() {
+  ['inpName','inpContact','inpUtr','inpCard','inpExp','inpCvv','inpCname'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  clearVip();
+}
+
+// ════════════════════════════════════════
+//  HISTORY
+// ════════════════════════════════════════
+async function openHistory() {
+  document.getElementById('bookingPopup').classList.remove('open');
+  await showHistory();
+}
+
+async function showHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '<div style="text-align:center;padding:20px"><span class="spinner"></span></div>';
+  document.getElementById('historyPopup').classList.add('open');
+
+  const data = await api('/bookings');
+  if (!data.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;">No bookings yet</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(b => {
+    const isActive   = b.status === 'confirmed';
+    const isCancelled= b.status === 'cancelled';
+    const isRefunded = b.status === 'refunded';
+
+    const refundHtml = (b.refund) ? `
+      <div class="refund-section">
+        <div class="refund-title">🔄 Refund Details</div>
+        <div class="refund-row"><span>Refund ID</span><span>${b.refund.refundId}</span></div>
+        <div class="refund-row"><span>Amount</span><span style="color:var(--green)">₹${b.refund.refundAmount}</span></div>
+        <div class="refund-row"><span>Reason</span><span>${b.refund.reason}</span></div>
+        <div class="refund-row"><span>Requested</span><span>${b.refund.requestedAt}</span></div>
+        ${b.refund.processedAt ? `<div class="refund-row"><span>Processed</span><span>${b.refund.processedAt}</span></div>` : ''}
+        <div class="refund-row"><span>Status</span><span><span class="refund-status-badge ${b.refund.refundStatus}">${b.refund.refundStatus.toUpperCase()}</span></span></div>
+      </div>` : '';
+
+    return `
+      <div class="hist-item">
+        <div class="hi-top">
+          <span class="hi-id">${b.id}</span>
+          <span class="hi-status ${b.status}">${b.status === 'confirmed' ? '✓ Confirmed' : b.status === 'cancelled' ? '✕ Cancelled' : '↩ Refunded'}</span>
+        </div>
+        <div class="hi-main">${b.movie}</div>
+        <div class="hi-meta">🪑 ${b.seats.join(', ')} · ${b.time}</div>
+        <div class="hi-theater">🏛️ ${b.theater} · ${b.date}</div>
+        <div class="hi-pricing">
+          ${b.isVip ? `<span class="hi-price-tag vip">⭐ VIP · ${b.discount}% off</span>` : ''}
+          ${b.discountAmount > 0 ? `<span class="hi-price-tag base">Base ₹${b.baseTotal}</span><span class="hi-price-tag disc">−₹${b.discountAmount}</span>` : `<span class="hi-price-tag base">₹${b.baseTotal}</span>`}
+          <span class="hi-price-tag final">Paid ₹${b.finalTotal}</span>
+          <span class="hi-price-tag base">${b.payMethod.toUpperCase()}</span>
+        </div>
+        ${refundHtml}
+        ${isActive ? `
+        <div style="margin-top:10px">
+          <button class="btn btn-orange btn-sm" onclick="openCancelConfirm('${b.id}', ${b.finalTotal})">
+            ✕ Cancel & Refund
+          </button>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function closeHistory() { document.getElementById('historyPopup').classList.remove('open'); }
+
+// ════════════════════════════════════════
+//  CANCELLATION FLOW
+// ════════════════════════════════════════
+function openCancelConfirm(bookingId, refundAmt) {
+  pendingCancelBookingId = bookingId;
+  document.getElementById('cancelRefundAmt').textContent = `₹${refundAmt}`;
+  document.getElementById('cancelReason').value = '';
+  document.getElementById('cancelPopup').classList.add('open');
+}
+
+function closeCancelPopup() {
+  document.getElementById('cancelPopup').classList.remove('open');
+  pendingCancelBookingId = null;
+}
+
+async function confirmCancel() {
+  if (!pendingCancelBookingId) return;
+
+  const btn = document.getElementById('confirmCancelBtn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+
+  const reason = document.getElementById('cancelReason').value.trim();
+  const res = await api('/booking/cancel', {
+    method: 'POST',
+    body: JSON.stringify({ bookingId: pendingCancelBookingId, reason })
+  });
+
+  btn.innerHTML = 'Yes, Cancel'; btn.disabled = false;
+
+  if (!res.success) { showToast('❌ ' + res.message, 'warn'); closeCancelPopup(); return; }
+
+  closeCancelPopup();
+  showToast(`✅ Booking cancelled. Refund of ₹${res.booking.refund.refundAmount} initiated.`, 'success');
+
+  // Refresh history to show updated status
+  await showHistory();
+
+  // Refresh seat map if we're on the same movie
+  if (currentMovie && res.booking.movieId === currentMovie.id) {
+    await loadSeatMap();
+    theaters = await api('/theaters');
+    currentTheater = theaters.find(t => t.id === currentTheater.id);
+    renderMovies();
+  }
+
+  // Poll for refund status update after 3 seconds
+  setTimeout(async () => {
+    if (document.getElementById('historyPopup').classList.contains('open')) {
+      await showHistory();
+      showToast('💜 Refund processed successfully!', 'vip');
+    }
+  }, 3200);
+}
+
+// ════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════
+let toastT;
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ════════════════════════════════════════
+//  CARD FORMATTING
+// ════════════════════════════════════════
+document.getElementById('inpCard').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);
+});
+document.getElementById('inpExp').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'$1/$2').slice(0,5);
+});
+document.getElementById('inpVipId').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
+document.getElementById('inpVipId').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') verifyVip();
+});
+
+// Release seats on page close
+window.addEventListener('beforeunload', () => {
+  if (currentMovie) navigator.sendBeacon('/api/seats/release', JSON.stringify({ movieId: currentMovie.id, sessionId: SESSION_ID }));
+});
+</script>
+</body>
+</html>
